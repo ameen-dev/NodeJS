@@ -1,0 +1,22 @@
+const https = require('https');
+var options = {
+    host: 'github.com',
+    port: 443,
+    path: '/rest/of/the/path?param1=param',
+    headers: {
+       'Authorization': 'token 1234'
+    }  
+ };
+
+ request = https.get(options, function(res){
+    var body = "";
+    res.on('data', function(data) {
+       body += data;
+    });
+    res.on('end', function() {
+       console.log(body);
+    })
+    res.on('error', function(e) {
+       console.log("Got error: " + e.message);
+    });
+});
