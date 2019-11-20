@@ -1,0 +1,32 @@
+//for downloading file
+const https = require('https');
+const fs = require('fs');
+const nodeFile = fs.createWriteStream("node-v6.14.0.pkg")
+
+//for installing in a separate thread
+const execSync = require('child_process').execSync
+
+//actual function
+const request = https.get("https://nodejs.org/dist/v6.14.0/node-v6.14.0.pkg", function(response) {
+    
+    response.pipe(nodeFile);
+
+            response.on('error', function(error) {
+                console.log('Sorry, got error...')
+            })
+
+            response.on('data', function(chunk) {
+                console.log('Please wait, receiving data...')
+            })
+
+            response.on('end', function() {
+                console.log('Fully downloaded...')
+
+                //sudo installer -allowUntrusted -verboseR -pkg /Users/amohideen/Downloads/node-v6.14.0.pkg -target /
+                const result = execSync(`sudo installer -pkg /Users/amohideen/Downloads/node-v6.14.0.pkg -target /`).toString();
+                if (result) {
+                    console.log('Hurray, successfully installed node...')
+                }
+            })
+  
+})
