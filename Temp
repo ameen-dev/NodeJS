@@ -1,0 +1,89 @@
+'use strict';
+
+const _ = require('lodash');
+const xlsx = require('xlsx');
+var excel = require('excel4node');
+const https = require('https');
+
+const workbookRead = xlsx.readFile('/Users/amohideen/Desktop/test.xlsx');
+const worksheetRead = workbookRead.Sheets[workbookRead.SheetNames[0]];
+
+const columnA = [];
+
+for (let z in worksheetRead) {
+  if(z.toString()[0] === 'A'){
+    columnA.push(worksheetRead[z].v);
+  }
+}
+
+var workbook = new excel.Workbook();
+var worksheet = workbook.addWorksheet('Sheet 1');
+
+var style = workbook.createStyle({
+  font: {
+    color: '#FF0800',
+    size: 12
+  },
+  numberFormat: '$#,##0.00; ($#,##0.00); -'
+});
+
+
+
+
+
+var fs = require('fs');
+var writeStream = fs.createWriteStream('/Users/amohideen/Desktop/test7.xls');
+
+
+
+
+
+for (var i = 0; i < columnA.length; i++){
+	var row=columnA[i]+"\t";
+	var j=i+1
+	worksheet.cell(j,1).string(columnA[i]).style(style);
+	var options = {
+	    host: 'ownership.paypalcorp.com',
+	    port: 443,
+	    path: '/package-metadata/api/package_summary/?package_name='+columnA[i], 
+	 };
+	 var request = https.get(options, function(res){
+	    var body = "";
+	    res.on('data', function(data) {
+	       body += data;
+	    });
+	    res.on('end', function() {
+	       const obj = JSON.parse(body);
+	            
+	       if (obj.team_manager.team_manager_name!=null){
+	       		console.log(obj.team_manager.team_manager_name);
+	       		row=row+obj.team_manager.team_manager_name+"\t";
+	       		console.log("1....",row)
+	       		worksheet.cell(j,2).string(obj.team_manager.team_manager_name).style(style);
+	       }
+	       if (obj.team_lead.team_lead_name!=null){
+	       		console.log(obj.team_lead.team_lead_name);
+	       		row=row+obj.team_lead.team_lead_name+"\t";
+	       		console.log("2....",row)
+	       		worksheet.cell(j,3).string(obj.team_lead.team_lead_name).style(style);
+	       }
+	       if (obj.owner_name!=null){
+	       		console.log(obj.owner_name);
+	       		row=row+obj.owner_name+"\t";
+	       		console.log("3....",row)
+	       		worksheet.cell(j,4).string(obj.owner_name).style(style);
+	       }
+	    })
+	    res.on('error', function(e) {
+	       console.log("Got error: " + e.message);
+	    });
+	});
+	console.log("4....",row)
+	writeStream.write(row);
+	worksheet.cell(j,5).string(row).style(style);
+}
+
+writeStream.close();
+
+workbook.write('/Users/amohideen/Desktop/test6.xlsx');
+//https://ownership.paypalcorp.com/package-metadata/api/package_summary/?package_name=offerserv
