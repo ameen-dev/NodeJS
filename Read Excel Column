@@ -1,0 +1,19 @@
+//npm install lodash --save
+//npm i xlsx
+
+'use strict';
+const _ = require('lodash');
+const xlsx = require('xlsx');
+
+const workbook = xlsx.readFile('/Users/amohideen/Desktop/test.xlsx');
+const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+const columnA = [];
+
+for (let z in worksheet) {
+  if(z.toString()[0] === 'A'){
+    columnA.push(worksheet[z].v);
+  }
+}
+
+console.log(columnA);
