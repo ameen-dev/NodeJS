@@ -11,7 +11,7 @@ const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 const columnA = [];
 
 for (let z in worksheet) {
-  if(z.toString()[0] === 'A'){
+  if(z.toString()[0] === 'A'){                                     //Here 'A' is the column to be read
     columnA.push(worksheet[z].v);
   }
 }
