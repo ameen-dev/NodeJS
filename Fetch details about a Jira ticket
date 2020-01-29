@@ -1,0 +1,40 @@
+var request = require('request');
+
+function getJIRAData() {
+    var components = "";
+    return new Promise(function(resolve, reject) {
+        var response_data = '';
+        var jira_url = "https://engineering.p.com/jira/rest/api/2/issue/DTRELFMW-428";
+        request.get(jira_url, {
+            "strictSSL": false,
+            "auth": {
+                "user": "ameen",
+                "pass": "123"
+            }
+        })
+        .on('error', function(err) {
+          console.error(err);
+          reject(err);
+        })
+        .on('data', function (chunk) {
+            response_data += chunk;
+        })
+        .on('end', function() {
+            try {
+                console.log("in try block");
+                var parsedData = JSON.parse(response_data);
+                if(parsedData.hasOwnProperty("fields")) {
+                    console.log(parsedData.fields.status.name);
+                }
+                resolve("success");
+            } catch(e) {
+                console.log("in catch block");
+                console.log(e)
+                reject(e);
+            }
+        })
+    }); 
+}
+
+console.log("Program started");
+getJIRAData();
