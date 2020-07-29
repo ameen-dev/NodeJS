@@ -1,0 +1,28 @@
+const http = require('http');
+var request = require('request');
+qualityCheck("PP03");
+
+function qualityCheck(jiraId) {
+    return new Promise(function(resolve, reject) {
+        var options = {
+            host: 'localhost',
+            port: 7896,
+            path: '/api/validate_release?jira_id='+jiraId,  
+         };
+        request = http.get(options, function(res){
+            var body = "";
+            res.on('data', function(data) {
+               body += data;
+            });
+            res.on('end', function() {
+              var obj = JSON.parse(body);              
+              console.log(obj);   
+              resolve(obj);
+            })
+            res.on('error', function(e) {
+               console.log("Got error: " + e.message);
+               reject(err);
+            });
+        });
+    });
+}
