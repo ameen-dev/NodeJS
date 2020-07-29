@@ -1,0 +1,101 @@
+const http = require('http');
+var request = require('request');
+qualityCheck("PP03");
+
+function qualityCheck(jiraId) {
+    return new Promise(function(resolve, reject) {
+        var options = {
+            host: 'localhost',
+            port: 7896,
+            path: '/api/validate_release?jira_id='+jiraId,  
+         };
+        request = http.get(options, function(res){
+            var body = "";
+            res.on('data', function(data) {
+               body += data;
+            });
+            res.on('end', function() {
+              var obj = JSON.parse(body);              
+              console.log(obj);   
+              resolve(obj);
+            })
+            res.on('error', function(e) {
+               console.log("Got error: " + e.message);
+               reject(err);
+            });
+        });
+    });
+}
+
+|||
+
+function qualityCheckRC(message) {
+	return new Promise(function(resolve, reject) {
+		var splits = generic.splitMessage(message.text,1);
+		var issueId = '';
+		if(splits) {
+			issueId = splits[1].trim();
+			if(issueId) {
+				requests.qualityValidateRC(issueId)                                                     //accessing this function in another file
+				.then(function(result) {
+					var toreply = "Quality validation RC result: \n ```" + result + "```";
+					resolve(toreply);
+				})
+				.catch(function(error) {
+					console.log(error);
+					resolve('An error occured while processing your request');
+				})
+			} else {
+				resolve("Invalid JIRA ticket ID");
+			}
+		} else {
+			resolve("Invalid input. Please use `help` to know bot command syntax.");
+		}
+	});
+}
+
+module.exports = {	
+	handleMessage: function(keyWord, message) {
+		var tmpSplit = message.text.split(/\s*\,\s*|\s+/);
+		var toCheck = tmpSplit[0].toLowerCase();
+		return new Promise(function(resolve, reject) {
+			switch(toCheck) {
+				case "help": 
+					resolve(CapabilitiesOffered());
+					break;
+				case "qualitycheck_rc":
+					resolve(qualityCheckRC(message));
+					break;
+				default: 
+					resolve("You message is not recognized by bot. Please use `help` to know bot command syntax.");
+					break;
+			}
+		});		
+	}		
+}
+
+|||
+
+module.exports = {
+    qualityValidateRC: function(jiraID) {
+        var requestPath = mainJSON.releaseRC.path;
+        var options = {'jira_id': jiraID};
+        requestPath += (options) ? '?' + qs.stringify(options) : '';
+        var requestOptions = {
+            host: mainJSON.releaseRC.host,
+            port: mainJSON.releaseRC.port,
+            path: requestPath
+        };
+        return new Promise(function(resolve, reject) {
+            generic.genericHttpGet(requestOptions)
+            .then(function(res) {             
+                console.log(toReturn);   
+                resolve(toReturn);
+            })
+            .catch(function(err) {
+                console.log(err);
+                reject(err);
+            })
+        });                
+    }
+}
