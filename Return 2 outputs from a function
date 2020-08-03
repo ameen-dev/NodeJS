@@ -1,0 +1,83 @@
+Simple:
+
+test();
+function test(){
+    console.log(qualityCheck()[0]);
+}
+
+function qualityCheck() {
+    return ["msg", "newMsg"];
+}
+
+-----------------------------------------------------------------------------------------------------------------
+
+2 outputs where one is a promise:
+
+var mainJSON = require('./prod_config');
+var qs = require('querystring');
+var generic = require('./generic.js');
+qualityCheck("J-83003");
+
+function qualityCheck(jiraID) {
+    var requestPath = mainJSON.releaseRC.path;
+    var options = {'jira_id': jiraID};
+    requestPath += (options) ? '?' + qs.stringify(options) : '';
+    var requestOptions = {
+        host: mainJSON.releaseRC.host,
+        port: mainJSON.releaseRC.port,
+        path: requestPath
+    };
+    return new Promise(function(resolve, reject) {
+        generic.genericHttpGet(requestOptions)
+        .then(function(res) {
+            if(res[1]==200){
+                console.log(res[0].results)
+                resolve(res[0].results); 
+            }else if(res[1]==400){
+                resolve(res[0].message);
+            }else{
+                toReturn = "An error has occurred";
+                resolve(toReturn);
+            }  
+            console.log(toReturn);
+        })
+        .catch(function(err) {
+            console.error(err);
+            reject(err);
+        })
+    });
+}
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+genericHttpGet: function(requestOptions) {        
+        return new Promise(function(resolve, reject) {
+            var request = http.get(requestOptions, function(response) {
+                var responseData = '';
+                response.on('error', function(error) {
+                    console.error(error);
+                    reject(error);
+                });
+                response.on('data', function(chunk) {
+                    responseData += chunk;
+                });
+                response.on('end', function() {
+                    try {
+                        var parsedData = JSON.parse(responseData);
+                        resolve([parsedData,response.statusCode]);
+                    } catch(error) {                        
+                        console.log(error);
+                        reject(error);
+                    }                
+                });
+            });
+            request.on('error', function(err) {
+                console.log(err);
+                reject(err);
+            });
+        });
+    }
+    
+    
+    
+    
