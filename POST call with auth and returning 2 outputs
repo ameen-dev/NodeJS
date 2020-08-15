@@ -1,0 +1,29 @@
+genericHttpPostWithStatusCode: function(requestOptions, postData) {        
+        return new Promise(function(resolve, reject) {       
+            var request = http.request(requestOptions, function(response) {
+                var responseData = '';
+                response.on('error', function(error) {
+                    console.log(error);
+                    reject(error);
+                });
+                response.on('data', function(chunk) {
+                    responseData += chunk;
+                });
+                response.on('end', function() {
+                    try {
+                        var parsedData = JSON.parse(responseData);
+                        resolve([parsedData,response.statusCode]);
+                    } catch(e) {
+                        console.log(e);
+                        reject(e);
+                    }
+                });
+            });
+            request.on('error', function(err) {
+                console.log(err);
+                reject(err);
+            });
+            request.write(postData);
+            request.end();
+        });
+    }
