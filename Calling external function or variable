@@ -1,0 +1,7 @@
+import utils from "../../../common/utils";
+//utils.js is a file which has a var called 'TagForcedDecomm' and for you to use it in this file
+var tagForcedDecomm = utils.TagForcedDecomm
+
+const vmconfig = require('./service_config/utils.js');
+//vmconfig.js is a file which has a var called 'TagForcedDecomm' and for you to use it in this file
+var tagForcedDecomm = vmconfig.TagForcedDecomm
