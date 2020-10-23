@@ -1,0 +1,9 @@
+var car = {type:'Fiat', model:'500', color:'white'};
+console.log("car", car)
+console.log("carType", car.type)
+var tocheck =  'color'
+if(car.hasOwnProperty(tocheck)){
+    console.log("car object contains", tocheck)
+}else{
+    console.log("car object doesn't contain", tocheck)
+}
